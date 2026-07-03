@@ -2,7 +2,7 @@
 'use strict';
 
 // Bump this version whenever index.html or the assets change, to force an update.
-const CACHE = 'pakkeliste-v6-1';
+const CACHE = 'pakkeliste-v7-2';
 
 // App shell — everything needed to run offline.
 const ASSETS = [

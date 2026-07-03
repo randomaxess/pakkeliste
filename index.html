@@ -1,749 +1,1747 @@
 <!doctype html>
 <html lang="da" dir="ltr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#2f6df6">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Pakkeliste">
-<title>Smart Pakkeliste</title>
-<style>
-  :root{
-    color-scheme: light;
-    --bg:#f4f6fb; --card:#ffffff; --ink:#1b2333; --muted:#6b7488;
-    --line:#e5e9f2; --brand:#2f6df6; --brand-ink:#ffffff;
-    --accent:#eaf1ff; --ok:#1f9d55; --warn:#c9761d; --chip:#eef1f7;
-    --shadow:0 1px 3px rgba(20,30,60,.08),0 8px 24px rgba(20,30,60,.06);
-    --radius:14px;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      color-scheme: dark;
-      --bg:#0f141f; --card:#171e2c; --ink:#e8ecf5; --muted:#9aa4ba;
-      --line:#253043; --brand:#5b8bff; --brand-ink:#0b1120;
-      --accent:#1b2740; --ok:#3ac07a; --warn:#e0a25e; --chip:#212b3d;
-      --shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
-    }
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{background:var(--bg); color:var(--ink);
-    font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-    padding-block:24px; padding-inline:16px}
-  .wrap{max-width:1000px; margin-inline:auto}
-  header.top{margin-block-end:18px}
-  header.top h1{margin:0 0 4px; font-size:26px; letter-spacing:-.02em}
-  header.top p{margin:0; color:var(--muted)}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#2f6df6" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon-192.png" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Pakkeliste" />
+    <title>Smart Pakkeliste</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f6fb;
+        --card: #ffffff;
+        --ink: #1b2333;
+        --muted: #6b7488;
+        --line: #e5e9f2;
+        --brand: #2f6df6;
+        --brand-ink: #ffffff;
+        --accent: #eaf1ff;
+        --ok: #1f9d55;
+        --warn: #c9761d;
+        --chip: #eef1f7;
+        --shadow: 0 1px 3px rgba(20, 30, 60, 0.08), 0 8px 24px rgba(20, 30, 60, 0.06);
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --bg: #0f141f;
+          --card: #171e2c;
+          --ink: #e8ecf5;
+          --muted: #9aa4ba;
+          --line: #253043;
+          --brand: #5b8bff;
+          --brand-ink: #0b1120;
+          --accent: #1b2740;
+          --ok: #3ac07a;
+          --warn: #e0a25e;
+          --chip: #212b3d;
+          --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          15px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        padding-block: 24px;
+        padding-inline: 16px;
+      }
+      .wrap {
+        max-width: 1000px;
+        margin-inline: auto;
+      }
+      header.top {
+        margin-block-end: 18px;
+      }
+      header.top h1 {
+        margin: 0 0 4px;
+        font-size: 26px;
+        letter-spacing: -0.02em;
+      }
+      header.top p {
+        margin: 0;
+        color: var(--muted);
+      }
 
-  .grid{display:grid; grid-template-columns:1fr; gap:16px}
-  @media(min-width:860px){ .grid{grid-template-columns:340px 1fr; align-items:start} }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      @media (min-width: 860px) {
+        .grid {
+          grid-template-columns: 340px 1fr;
+          align-items: start;
+        }
+      }
 
-  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px}
-  .card + .card{margin-block-start:16px}
-  .card h2{margin:0 0 12px; font-size:15px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
-  fieldset{border:0; margin:0; padding:0}
-  fieldset + fieldset{margin-block-start:16px}
-  legend{font-weight:600; padding:0; margin-block-end:8px}
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 18px;
+      }
+      .card + .card {
+        margin-block-start: 16px;
+      }
+      .card h2 {
+        margin: 0 0 12px;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+      fieldset {
+        border: 0;
+        margin: 0;
+        padding: 0;
+      }
+      fieldset + fieldset {
+        margin-block-start: 16px;
+      }
+      legend {
+        font-weight: 600;
+        padding: 0;
+        margin-block-end: 8px;
+      }
 
-  .person-row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-    padding:6px 8px; border:1px solid var(--line); border-radius:10px; margin-block-end:8px}
-  .person-row .person-name{display:flex; align-items:center; gap:8px; flex:1; min-inline-size:120px}
-  .person-row .person-name > input[type='checkbox']{inline-size:18px; block-size:18px; accent-color:var(--brand); flex:none}
-  .name-input{flex:1; min-inline-size:60px; font:inherit; font-weight:600; padding:5px 7px;
-    border:1px solid transparent; border-radius:7px; background:transparent; color:var(--ink)}
-  .name-input:hover,.name-input:focus{border-color:var(--line); background:var(--card); outline:none}
-  .prow-right{display:flex; align-items:center; gap:10px}
-  .flags{display:flex; gap:10px}
-  .flag{display:flex; align-items:center; gap:5px; color:var(--muted); font-size:14px}
-  .flag input[type='checkbox']{inline-size:16px; block-size:16px}
-  .del{inline-size:32px; block-size:32px; padding:0; border-radius:8px; color:var(--muted); font-size:15px}
-  .del:hover{border-color:var(--warn); color:var(--warn)}
-  .addperson{display:flex; gap:8px; margin-block:4px 4px}
-  .addperson input{flex:1; padding:8px 10px; border:1px solid var(--line); border-radius:9px; background:var(--card); color:var(--ink); font:inherit}
-  .mini-btns{display:flex; gap:8px; margin-block-end:10px}
-  .mini-btns button{flex:1}
+      .person-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 6px 8px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-block-end: 8px;
+      }
+      .person-row .person-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-inline-size: 120px;
+      }
+      .person-row .person-name > input[type='checkbox'] {
+        inline-size: 18px;
+        block-size: 18px;
+        accent-color: var(--brand);
+        flex: none;
+      }
+      .name-input {
+        flex: 1;
+        min-inline-size: 60px;
+        font: inherit;
+        font-weight: 600;
+        padding: 5px 7px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--ink);
+      }
+      .name-input:hover,
+      .name-input:focus {
+        border-color: var(--line);
+        background: var(--card);
+        outline: none;
+      }
+      .prow-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .flags {
+        display: flex;
+        gap: 10px;
+      }
+      .flag {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .flag input[type='checkbox'] {
+        inline-size: 16px;
+        block-size: 16px;
+      }
+      .del {
+        inline-size: 32px;
+        block-size: 32px;
+        padding: 0;
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 15px;
+      }
+      .del:hover {
+        border-color: var(--warn);
+        color: var(--warn);
+      }
+      .addperson {
+        display: flex;
+        gap: 8px;
+        margin-block: 4px 4px;
+      }
+      .addperson input {
+        flex: 1;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--card);
+        color: var(--ink);
+        font: inherit;
+      }
+      .mini-btns {
+        display: flex;
+        gap: 8px;
+        margin-block-end: 10px;
+      }
+      .mini-btns button {
+        flex: 1;
+      }
 
-  button{font:inherit; cursor:pointer; border:1px solid var(--line); background:var(--card); color:var(--ink); padding:8px 12px; border-radius:10px}
-  button:hover{border-color:var(--brand)}
-  button.primary{background:var(--brand); color:var(--brand-ink); border-color:var(--brand); font-weight:600}
-  .seg{display:flex; gap:6px; flex-wrap:wrap}
-  .seg label{flex:1; min-inline-size:84px}
-  .seg input{position:absolute; opacity:0; pointer-events:none}
-  .seg span{display:block; text-align:center; padding:8px 6px; border:1px solid var(--line); border-radius:10px; color:var(--muted)}
-  .seg input:checked + span{background:var(--accent); border-color:var(--brand); color:var(--ink); font-weight:600}
-  .opt{display:flex; align-items:center; gap:9px; padding:6px 0}
-  .opt input[type='checkbox']{inline-size:18px; block-size:18px; accent-color:var(--brand)}
-  .field{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:6px 0}
-  .field input[type='number']{inline-size:84px; padding:7px 8px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); font:inherit}
+      button {
+        font: inherit;
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--ink);
+        padding: 8px 12px;
+        border-radius: 10px;
+      }
+      button:hover {
+        border-color: var(--brand);
+      }
+      button.primary {
+        background: var(--brand);
+        color: var(--brand-ink);
+        border-color: var(--brand);
+        font-weight: 600;
+      }
+      .seg {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .seg label {
+        flex: 1;
+        min-inline-size: 84px;
+      }
+      .seg input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .seg span {
+        display: block;
+        text-align: center;
+        padding: 8px 6px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        color: var(--muted);
+      }
+      .seg input:checked + span {
+        background: var(--accent);
+        border-color: var(--brand);
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .opt {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 6px 0;
+      }
+      .opt input[type='checkbox'] {
+        inline-size: 18px;
+        block-size: 18px;
+        accent-color: var(--brand);
+      }
+      .field {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 0;
+      }
+      .field input[type='number'] {
+        inline-size: 84px;
+        padding: 7px 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--card);
+        color: var(--ink);
+        font: inherit;
+      }
 
-  .resume{display:flex; flex-wrap:wrap; gap:8px 18px; align-items:baseline; margin-block-end:6px}
-  .resume b{font-size:22px}
-  .resume .muted{color:var(--muted)}
-  .bar{block-size:8px; background:var(--chip); border-radius:99px; overflow:hidden; margin:10px 0 14px}
-  .bar > i{display:block; block-size:100%; inline-size:0; background:var(--ok); transition:inline-size .25s ease}
+      .resume {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        align-items: baseline;
+        margin-block-end: 6px;
+      }
+      .resume b {
+        font-size: 22px;
+      }
+      .resume .muted {
+        color: var(--muted);
+      }
+      .bar {
+        block-size: 8px;
+        background: var(--chip);
+        border-radius: 99px;
+        overflow: hidden;
+        margin: 10px 0 14px;
+      }
+      .bar > i {
+        display: block;
+        block-size: 100%;
+        inline-size: 0;
+        background: var(--ok);
+        transition: inline-size 0.25s ease;
+      }
 
-  .tabs{display:flex; flex-wrap:wrap; gap:6px; margin-block-end:12px}
-  .tab{padding:6px 12px; border-radius:999px; font-size:13px}
-  .tab.active{background:var(--brand); color:var(--brand-ink); border-color:var(--brand); font-weight:600}
-  .toolbar{display:flex; gap:8px; flex-wrap:wrap; margin-block-end:14px}
-  .fill{margin-block-end:12px; font-size:13px; padding:7px 12px}
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-block-end: 12px;
+      }
+      .tab {
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+      }
+      .tab.active {
+        background: var(--brand);
+        color: var(--brand-ink);
+        border-color: var(--brand);
+        font-weight: 600;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-block-end: 14px;
+      }
+      .fill {
+        margin-block-end: 12px;
+        font-size: 13px;
+        padding: 7px 12px;
+      }
 
-  .cat{margin-block-end:16px}
-  .cat h3{margin:0 0 8px; font-size:14px; display:flex; align-items:center; gap:8px}
-  .cat h3 .count{color:var(--muted); font-weight:400}
-  .item{display:flex; align-items:center; gap:12px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; margin-block-end:7px}
-  .item .body{flex:1; min-inline-size:0}
-  .item .name{font-weight:600}
-  .item .who{color:var(--muted); font-size:12.5px; margin-block-start:1px}
-  .item.has{border-color:var(--brand); background:var(--accent)}
+      .cat {
+        margin-block-end: 16px;
+      }
+      .cat h3 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .cat h3 .count {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-block-end: 7px;
+      }
+      .item .body {
+        flex: 1;
+        min-inline-size: 0;
+      }
+      .item .name {
+        font-weight: 600;
+      }
+      .item .who {
+        color: var(--muted);
+        font-size: 12.5px;
+        margin-block-start: 1px;
+      }
+      .item.has {
+        border-color: var(--brand);
+        background: var(--accent);
+      }
 
-  .stepper{display:flex; align-items:center; flex:none}
-  .stepper button{inline-size:34px; block-size:34px; padding:0; font-size:20px; line-height:1; border-radius:9px; color:var(--brand)}
-  .stepper input{inline-size:48px; block-size:34px; text-align:center; border:1px solid var(--line); border-radius:9px; margin-inline:5px; background:var(--card); color:var(--ink); font:inherit; font-variant-numeric:tabular-nums}
-  .item.has .stepper input{font-weight:700; border-color:var(--brand)}
+      .stepper {
+        display: flex;
+        align-items: center;
+        flex: none;
+      }
+      .stepper button {
+        inline-size: 34px;
+        block-size: 34px;
+        padding: 0;
+        font-size: 20px;
+        line-height: 1;
+        border-radius: 9px;
+        color: var(--brand);
+      }
+      .stepper input {
+        inline-size: 48px;
+        block-size: 34px;
+        text-align: center;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        margin-inline: 5px;
+        background: var(--card);
+        color: var(--ink);
+        font: inherit;
+        font-variant-numeric: tabular-nums;
+      }
+      .item.has .stepper input {
+        font-weight: 700;
+        border-color: var(--brand);
+      }
 
-  .scrollx{overflow-x:auto; border:1px solid var(--line); border-radius:12px}
-  table.matrix{border-collapse:collapse; inline-size:100%; font-size:13px}
-  table.matrix th,table.matrix td{padding:7px 8px; border-block-end:1px solid var(--line); text-align:center; white-space:nowrap}
-  table.matrix th{color:var(--muted); font-weight:600; background:var(--card); position:sticky; top:0}
-  table.matrix th:first-child,table.matrix td:first-child{text-align:start; position:sticky; inset-inline-start:0; background:var(--card)}
-  table.matrix tr:last-child td{border-block-end:0}
-  input.cell{inline-size:56px; padding:5px 4px; border:1px solid var(--line); border-radius:7px; background:var(--card); color:var(--ink); font:inherit; text-align:center}
-  input.cell.has{background:var(--accent); border-color:var(--brand); font-weight:700}
-  td.tot{font-weight:700}
-  .muted{color:var(--muted)}
-  .empty{color:var(--muted); padding:20px; text-align:center}
+      .check {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        inline-size: 126px;
+      }
+      .check input[type='checkbox'] {
+        inline-size: 26px;
+        block-size: 26px;
+        accent-color: var(--ok);
+        cursor: pointer;
+      }
+      input.cellcheck {
+        inline-size: 20px;
+        block-size: 20px;
+        accent-color: var(--ok);
+        cursor: pointer;
+      }
 
-  details.info{margin-block-start:16px; border:1px solid var(--line); border-radius:12px; background:var(--card)}
-  details.info > summary{cursor:pointer; padding:12px 16px; font-weight:600; list-style:none}
-  details.info > summary::-webkit-details-marker{display:none}
-  details.info > summary::before{content:'▸ '; color:var(--muted)}
-  details.info[open] > summary::before{content:'▾ '}
-  details.info .inner{padding:0 16px 16px}
-  table.data{inline-size:100%; border-collapse:collapse; font-size:13px}
-  table.data th,table.data td{text-align:start; padding:6px 8px; border-block-end:1px solid var(--line); vertical-align:top}
-  table.data th{color:var(--muted); font-weight:600; position:sticky; top:0; background:var(--card)}
-  .tag{display:inline-block; background:var(--chip); border-radius:6px; padding:1px 7px; font-size:12px; color:var(--muted)}
-  .legend{color:var(--muted); font-size:13px; margin-block-start:10px}
-  footer{color:var(--muted); font-size:12px; text-align:center; margin-block-start:22px}
+      .scrollx {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      table.matrix {
+        border-collapse: collapse;
+        inline-size: 100%;
+        font-size: 13px;
+      }
+      table.matrix th,
+      table.matrix td {
+        padding: 7px 8px;
+        border-block-end: 1px solid var(--line);
+        text-align: center;
+        white-space: nowrap;
+      }
+      table.matrix th {
+        color: var(--muted);
+        font-weight: 600;
+        background: var(--card);
+        position: sticky;
+        top: 0;
+      }
+      table.matrix th:first-child,
+      table.matrix td:first-child {
+        text-align: start;
+        position: sticky;
+        inset-inline-start: 0;
+        background: var(--card);
+      }
+      table.matrix tr:last-child td {
+        border-block-end: 0;
+      }
+      input.cell {
+        inline-size: 56px;
+        padding: 5px 4px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--card);
+        color: var(--ink);
+        font: inherit;
+        text-align: center;
+      }
+      input.cell.has {
+        background: var(--accent);
+        border-color: var(--brand);
+        font-weight: 700;
+      }
+      td.tot {
+        font-weight: 700;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .empty {
+        color: var(--muted);
+        padding: 20px;
+        text-align: center;
+      }
 
-  @media print{
-    body{background:#fff; padding:0}
-    .no-print{display:none !important}
-    .card{box-shadow:none; border:none; padding:0}
-    .grid{display:block}
-  }
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header class="top">
-    <h1>🧳 Smart Pakkeliste</h1>
-    <p>Tæl op med + / − mens du pakker. Alt starter på 0.</p>
-  </header>
+      details.info {
+        margin-block-start: 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+      }
+      details.info > summary {
+        cursor: pointer;
+        padding: 12px 16px;
+        font-weight: 600;
+        list-style: none;
+      }
+      details.info > summary::-webkit-details-marker {
+        display: none;
+      }
+      details.info > summary::before {
+        content: '▸ ';
+        color: var(--muted);
+      }
+      details.info[open] > summary::before {
+        content: '▾ ';
+      }
+      details.info .inner {
+        padding: 0 16px 16px;
+      }
+      table.data {
+        inline-size: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      table.data th,
+      table.data td {
+        text-align: start;
+        padding: 6px 8px;
+        border-block-end: 1px solid var(--line);
+        vertical-align: top;
+      }
+      table.data th {
+        color: var(--muted);
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        background: var(--card);
+      }
+      .tag {
+        display: inline-block;
+        background: var(--chip);
+        border-radius: 6px;
+        padding: 1px 7px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .legend {
+        color: var(--muted);
+        font-size: 13px;
+        margin-block-start: 10px;
+      }
+      footer {
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+        margin-block-start: 22px;
+      }
 
-  <div class="grid">
-    <!-- ============ LEFT: setup ============ -->
-    <div class="no-print">
-      <div class="card">
-        <h2>Personer</h2>
-        <div class="mini-btns">
-          <button type="button" id="allInBtn">Alle med</button>
-          <button type="button" id="noneInBtn">Ingen</button>
-        </div>
-        <div id="people"></div>
-        <div class="addperson">
-          <input type="text" id="newPersonName" placeholder="Tilføj person…" maxlength="30">
-          <button type="button" id="addPersonBtn">+ Tilføj</button>
-        </div>
-        <p class="legend">✔ = med på turen. 👶 <b>barn</b> = kids-varer (fx flyverdragt). 🍼 <b>lille</b> = ble-alder (bleer). En lille er også et barn. Klik på navnet for at omdøbe, 🗑 for at fjerne.</p>
-      </div>
+      @media print {
+        body {
+          background: #fff;
+          padding: 0;
+        }
+        .no-print {
+          display: none !important;
+        }
+        .card {
+          box-shadow: none;
+          border: none;
+          padding: 0;
+        }
+        .grid {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <h1>🧳 Smart Pakkeliste</h1>
+        <p>Tæl op med + / − mens du pakker. Alt starter på 0.</p>
+      </header>
 
-      <div class="card">
-        <h2>Rejsen</h2>
-        <fieldset>
-          <legend>Sæson</legend>
-          <div class="seg" id="season">
-            <label><input type="radio" name="season" value="summer"><span>☀️ Sommer</span></label>
-            <label><input type="radio" name="season" value="mild"><span>🍃 Mild</span></label>
-            <label><input type="radio" name="season" value="winter"><span>❄️ Vinter</span></label>
+      <div class="grid">
+        <!-- ============ LEFT: setup ============ -->
+        <div class="no-print">
+          <div class="card">
+            <h2>Personer</h2>
+            <div class="mini-btns">
+              <button type="button" id="allInBtn">Alle med</button>
+              <button type="button" id="noneInBtn">Ingen</button>
+            </div>
+            <div id="people"></div>
+            <div class="addperson">
+              <input type="text" id="newPersonName" placeholder="Tilføj person…" maxlength="30" />
+              <button type="button" id="addPersonBtn">+ Tilføj</button>
+            </div>
+            <p class="legend">
+              ✔ = med på turen. 👶 <b>barn</b> = kids-varer (fx flyverdragt). 🍼 <b>lille</b> = ble-alder (bleer). En
+              lille er også et barn. Klik på navnet for at omdøbe, 🗑 for at fjerne.
+            </p>
           </div>
-        </fieldset>
-        <fieldset>
-          <legend>Type</legend>
-          <label class="opt"><input type="checkbox" id="warmDestination"> Ferieland (varmt rejsemål)</label>
-          <label class="opt"><input type="checkbox" id="active"> Aktiv ferie</label>
-        </fieldset>
-        <fieldset>
-          <div class="field"><label for="days">Antal dage</label><input type="number" id="days" min="1" max="90" value="7"></div>
-          <p class="legend">Antal dage bruges kun til "Udfyld forslag" (dagligt tøj = antal dage). Du tæller selv op pr. person.</p>
-        </fieldset>
+
+          <div class="card">
+            <h2>Rejsen</h2>
+            <fieldset>
+              <legend>Sæson</legend>
+              <div class="seg" id="season">
+                <label><input type="radio" name="season" value="summer" /><span>☀️ Sommer</span></label>
+                <label><input type="radio" name="season" value="mild" /><span>🍃 Mild</span></label>
+                <label><input type="radio" name="season" value="winter" /><span>❄️ Vinter</span></label>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>Type</legend>
+              <label class="opt"><input type="checkbox" id="warmDestination" /> Ferieland (varmt rejsemål)</label>
+              <label class="opt"><input type="checkbox" id="active" /> Aktiv ferie</label>
+            </fieldset>
+            <fieldset>
+              <div class="field">
+                <label for="days">Antal dage</label><input type="number" id="days" min="1" max="90" value="7" />
+              </div>
+              <p class="legend">
+                Antal dage bruges kun til "Udfyld forslag" (dagligt tøj = antal dage). Du tæller selv op pr. person.
+              </p>
+            </fieldset>
+          </div>
+        </div>
+
+        <!-- ============ RIGHT: packing list ============ -->
+        <div>
+          <div class="card">
+            <h2>Din pakkeliste</h2>
+            <div class="resume" id="summary"></div>
+            <div class="bar"><i id="barFill"></i></div>
+            <div class="tabs no-print" id="tabs"></div>
+            <div class="toolbar no-print">
+              <button type="button" id="exportBtn">⬇️ Eksportér JSON</button>
+              <button type="button" id="importBtn">⬆️ Importér JSON</button>
+              <button type="button" id="resetBtn">Nulstil alle antal (til 0)</button>
+              <input type="file" id="importFile" accept="application/json,.json" hidden />
+            </div>
+            <p class="legend no-print" id="ioStatus" style="margin-block: 0 12px"></p>
+            <div id="view"></div>
+          </div>
+
+          <details class="info no-print">
+            <summary>Sådan virker den</summary>
+            <div class="inner">
+              <ul>
+                <li>
+                  <b>Ja/nej-varer</b> krydser du bare af (pakket / ikke pakket). <b>Antal-varer</b> (fx dagligt tøj,
+                  sokker, bleer) tæller du op med + / − — de starter på 0. Se "Type" i rådata-tabellen; en vare gøres
+                  til antal med <code>count: true</code> i koden.
+                </li>
+                <li>
+                  <b>Antal er pr. person (mange-til-mange):</b> én person kan ende på 5 underbukser, en anden på 0. Ret
+                  det i personens fane eller i <b>📊 Overblik</b>-matrixen.
+                </li>
+                <li>
+                  <b>Personer er dine egne</b> — tilføj, omdøb og fjern frit til venstre. Navngivne varer (BH, skjorte,
+                  kjole …) er bundet til de oprindelige personer; nye personer får fælles/gruppe-varer.
+                </li>
+                <li><b>Udfyld forslag</b> forudfylder tomme felter med et bud (dagligt tøj = antal dage).</li>
+                <li>
+                  <b>🧺 Fælles</b> og <b>🚗 Bil</b> er delte lister med ét antal for hele familien/bilen — nu grupperet
+                  efter kategori ligesom person-listerne.
+                </li>
+              </ul>
+              <p class="legend">
+                Alt gemmes automatisk i browseren på denne enhed. Brug Eksportér/Importér for at flytte listen til en
+                anden enhed.
+              </p>
+            </div>
+          </details>
+
+          <details class="info no-print">
+            <summary>Rådata (master-liste)</summary>
+            <div class="inner">
+              <div style="max-height: 340px; overflow: auto">
+                <table class="data" id="rawData"></table>
+              </div>
+            </div>
+          </details>
+        </div>
       </div>
+
+      <footer>Smart Pakkeliste · alt kører lokalt i din browser · dine valg gemmes kun på denne enhed</footer>
     </div>
 
-    <!-- ============ RIGHT: packing list ============ -->
-    <div>
-      <div class="card">
-        <h2>Din pakkeliste</h2>
-        <div class="resume" id="summary"></div>
-        <div class="bar"><i id="barFill"></i></div>
-        <div class="tabs no-print" id="tabs"></div>
-        <div class="toolbar no-print">
-          <button type="button" id="exportBtn">⬇️ Eksportér JSON</button>
-          <button type="button" id="importBtn">⬆️ Importér JSON</button>
-          <button type="button" id="resetBtn">Nulstil alle antal (til 0)</button>
-          <input type="file" id="importFile" accept="application/json,.json" hidden>
-        </div>
-        <p class="legend no-print" id="ioStatus" style="margin-block:0 12px"></p>
-        <div id="view"></div>
-      </div>
+    <script>
+      'use strict';
 
-      <details class="info no-print">
-        <summary>Sådan virker den</summary>
-        <div class="inner">
-          <ul>
-            <li>Hver vare har et <b>antal-felt der starter på 0</b> — tæl op med + / − mens du lægger ting i tasken (+ til venstre, − til højre).</li>
-            <li><b>Antal er pr. person (mange-til-mange):</b> én person kan ende på 5 underbukser, en anden på 0. Ret det i personens fane eller i <b>📊 Overblik</b>-matrixen.</li>
-            <li><b>Personer er dine egne</b> — tilføj, omdøb og fjern frit til venstre. Navngivne varer (BH, skjorte, kjole …) er bundet til de oprindelige personer; nye personer får fælles/gruppe-varer.</li>
-            <li><b>Udfyld forslag</b> forudfylder tomme felter med et bud (dagligt tøj = antal dage).</li>
-            <li><b>🧺 Fælles</b> og <b>🚗 Bil</b> er delte lister med ét antal for hele familien/bilen.</li>
-          </ul>
-          <p class="legend">Alt gemmes automatisk i browseren på denne enhed. Brug Eksportér/Importér for at flytte listen til en anden enhed.</p>
-        </div>
-      </details>
-
-      <details class="info no-print">
-        <summary>Rådata (master-liste)</summary>
-        <div class="inner">
-          <div style="max-height:340px; overflow:auto">
-            <table class="data" id="rawData"></table>
-          </div>
-        </div>
-      </details>
-    </div>
-  </div>
-
-  <footer>Smart Pakkeliste · alt kører lokalt i din browser · dine valg gemmes kun på denne enhed</footer>
-</div>
-
-<script>
-'use strict';
-
-/* =========================================================================
+      /* =========================================================================
    1) MASTER DATA
    Display text (item/category names, UI labels) stays Danish on purpose —
    only the code identifiers, keys and enum tokens are in English.
    ========================================================================= */
-  // Initial people — freely editable in the app.
-  const DEFAULT_PEOPLE = [
-    { id:'adult_j', name:'dad',    child:false, infant:false },
-    { id:'adult_m', name:'mom',    child:false, infant:false },
-    { id:'child_g', name:'child1', child:true,  infant:false },
-    { id:'child_l', name:'child2', child:true,  infant:true  },
-    { id:'child_s', name:'child3', child:true,  infant:true  }
-  ];
+      // Initial people — freely editable in the app (rename via the name field).
+      const DEFAULT_PEOPLE = [
+        { id: 'adult_1', name: 'change', child: false, infant: false },
+        { id: 'adult_2', name: 'change', child: false, infant: false },
+        { id: 'child_1', name: 'change', child: true, infant: false },
+        { id: 'child_2', name: 'change', child: true, infant: true },
+        { id: 'child_3', name: 'change', child: true, infant: true },
+      ];
+      // Shorthands used in item `who` lists.
+      const j_id = DEFAULT_PEOPLE[0].id;
+      const m_id = DEFAULT_PEOPLE[1].id;
+      const g_id = DEFAULT_PEOPLE[2].id;
+      const l_id = DEFAULT_PEOPLE[3].id;
+      const s_id = DEFAULT_PEOPLE[4].id;
 
-  // who tokens: 'all' | 'children' (👶) | 'infants' (🍼) | person id
-  // condition tokens: 'always' | 'summer' | 'winter' | 'active' | 'summer_or_warm'
-  // shared: 'family' | 'car'  (shared items have one count for the whole group)
-  // perDay: default suggestion per person = number of trip days
-  const ITEMS = [
-    // Tøj
-    { name:'T-shirt',                    category:'Tøj', who:['all'],                          condition:'summer',          perDay:true },
-    { name:'Trøje',                      category:'Tøj', who:['all'],                          condition:'always' },
-    { name:'Hoodie',                     category:'Tøj', who:['all'],                          condition:'always' },
-    { name:'Shorts',                     category:'Tøj', who:['all'],                          condition:'summer' },
-    { name:'Bukser',                     category:'Tøj', who:['all'],                          condition:'always' },
-    { name:'Sokker (par)',               category:'Tøj', who:['all'],                          condition:'always',          perDay:true },
-    { name:'Underbukser',                category:'Tøj', who:['all'],                          condition:'always',          perDay:true },
-    { name:'Undertrøje',                 category:'Tøj', who:['child_g','child_l','child_s'],  condition:'always' },
-    { name:'BH',                         category:'Tøj', who:['adult_m'],                      condition:'always' },
-    { name:'Nattøj (sæt)',               category:'Tøj', who:['all'],                          condition:'always' },
-    { name:'Skjorte',                    category:'Tøj', who:['adult_j'],                      condition:'always' },
-    { name:'Jakke / overtøj',            category:'Tøj', who:['all'],                          condition:'always' },
-    { name:'Regnjakke / regntøj',        category:'Tøj', who:['all'],                          condition:'always' },
-    { name:'Kjole',                      category:'Tøj', who:['adult_m','child_g','child_l'],  condition:'always' },
-    { name:'Nederdel',                   category:'Tøj', who:['adult_m','child_g','child_l'],  condition:'always' },
-    { name:'Solhat / kasket',            category:'Tøj', who:['adult_m','child_g','child_l','child_s'], condition:'summer' },
-    { name:'Hue',                        category:'Tøj', who:['all'],                          condition:'winter' },
-    { name:'Handsker',                   category:'Tøj', who:['all'],                          condition:'winter' },
-    { name:'Halstørklæde',               category:'Tøj', who:['all'],                          condition:'winter' },
-    { name:'Vinterjakke',                category:'Tøj', who:['all'],                          condition:'winter' },
-    { name:'Fleece / ekstra lag',        category:'Tøj', who:['all'],                          condition:'active' },
-    { name:'Flyverdragt',                category:'Tøj', who:['children'],                     condition:'winter' },
-    { name:'Træningstøj / sportstøj',    category:'Tøj', who:['all'],                          condition:'active' },
-    // Fodtøj
-    { name:'Gummistøvler',               category:'Fodtøj', who:['all'],                       condition:'always' },
-    { name:'Sandaler',                   category:'Fodtøj', who:['all'],                       condition:'summer' },
-    { name:'Sko',                        category:'Fodtøj', who:['all'],                       condition:'always' },
-    { name:'Vandresko',                  category:'Fodtøj', who:['all'],                       condition:'active' },
-    // Håndklæder
-    { name:'Håndklæder',                 category:'Håndklæder', who:['all'],                   condition:'always' },
-    { name:'Strand-/badelandshåndklæde', category:'Håndklæder', who:['all'],                   condition:'summer_or_warm' },
-    // Vand/bad
-    { name:'Badetøj',                    category:'Vand/bad', who:['all'],                     condition:'summer_or_warm' },
-    { name:'Dykkerbriller',              category:'Vand/bad', who:['all'],                     condition:'summer_or_warm' },
-    // Toiletsager
-    { name:'Tandbørstehoved',            category:'Toiletsager', who:['all'],                  condition:'always' },
-    // Tilbehør
-    { name:'Solbriller',                 category:'Tilbehør', who:['all'],                     condition:'summer' },
-    // Utilities (shared with the whole family)
-    { name:'Neglesaks',                  category:'Utilities', who:['all'],                    condition:'always',  shared:'family' },
-    { name:'Bleer',                      category:'Utilities', who:['infants'],                condition:'always',  perDay:true },
-    { name:'Tandbørste',                 category:'Utilities', who:['all'],                    condition:'always' },
-    { name:'Tandbørste-oplader',         category:'Utilities', who:['all'],                    condition:'always',  shared:'family' },
-    { name:'Solcreme',                   category:'Utilities', who:['all'],                    condition:'summer',  shared:'family' },
-    { name:'Mobiloplader',               category:'Utilities', who:['all'],                    condition:'always',  shared:'family' },
-    // Bil (shared with the car)
-    { name:'Snacks',                     category:'Bil', who:['all'],                          condition:'always',  shared:'car' },
-    { name:'Vand',                       category:'Bil', who:['all'],                          condition:'always',  shared:'car' }
-  ];
+      // who tokens: 'all' | 'children' (👶) | 'infants' (🍼) | person id
+      // condition tokens: 'always' | 'summer' | 'winter' | 'active' | 'summer_or_warm'
+      // shared: 'family' | 'car'  (shared items have one count for the whole group)
+      // perDay: default suggestion per person = number of trip days
+      const personal_items = 'Personlige ting';
+      const toilet = 'Toiletsager';
+      const ITEMS = [
+        // personal_items
+        { name: 'Oplader', category: personal_items, who: [j_id, m_id], condition: 'always' },
+        { name: 'Laptop', category: personal_items, who: [j_id], condition: 'always' },
+        { name: 'Tablet', category: personal_items, who: [m_id], condition: 'always' },
+        { name: 'Høretelefoner', category: personal_items, who: [g_id], condition: 'always' },
+        { name: 'Tæppe', category: personal_items, who: [g_id], condition: 'always' },
+        { name: 'Work Laptop', category: personal_items, who: [j_id, m_id], condition: 'always' },
 
-  const CATEGORIES = ['Tøj','Fodtøj','Håndklæder','Vand/bad','Toiletsager','Tilbehør','Utilities','Bil'];
+        // Tøj
+        { name: 'T-shirt', category: 'Tøj', who: ['all'], condition: 'summer', perDay: true },
+        { name: 'Trøje', category: 'Tøj', who: ['all'], condition: 'always', perDay: true },
+        { name: 'Hoodie', category: 'Tøj', who: ['all'], condition: 'always', perDay: true },
+        { name: 'Shorts', category: 'Tøj', who: ['all'], condition: 'summer', perDay: true },
+        { name: 'Bukser', category: 'Tøj', who: ['all'], condition: 'always', perDay: true },
+        { name: 'Sokker (par)', category: 'Tøj', who: ['all'], condition: 'always', perDay: true },
+        { name: 'Underbukser', category: 'Tøj', who: ['all'], condition: 'always', perDay: true },
+        { name: 'Undertrøje', category: 'Tøj', who: [g_id, l_id, s_id], condition: 'always', perDay: true },
+        { name: 'BH', category: 'Tøj', who: [m_id], condition: 'always', perDay: true },
+        { name: 'Nattøj (sæt)', category: 'Tøj', who: ['all'], condition: 'always', perDay: true },
+        { name: 'Skjorte', category: 'Tøj', who: [j_id], condition: 'always', perDay: true },
+        { name: 'Kjole', category: 'Tøj', who: [m_id, g_id, l_id], condition: 'always', perDay: true },
+        { name: 'Nederdel', category: 'Tøj', who: [m_id, g_id, l_id], condition: 'always', perDay: true },
+        { name: 'Træningstøj / sportstøj', category: 'Tøj', who: ['all'], condition: 'active' },
+        { name: 'Fleece / ekstra lag', category: 'Tøj', who: ['all'], condition: 'active' },
 
-  // Shared buckets get their own tab, like a person but for the whole group.
-  const SHARED_BUCKETS = [
-    { id:'family', label:'🧺 Fælles', heading:'Fælles / delt', rowHint:'fælles for hele familien', emptyMsg:'Ingen fælles ting for denne tur.' },
-    { id:'car',    label:'🚗 Bil',    heading:'Bil',           rowHint:'til bilen',                 emptyMsg:'Ingen bil-ting for denne tur.' }
-  ];
+        // Udendørs
+        { name: 'Solbriller', category: 'Udendørs', who: ['all'], condition: 'summer' },
+        { name: 'Jakke / overtøj', category: 'Udendørs', who: ['all'], condition: 'always' },
+        { name: 'Regnjakke', category: 'Udendørs', who: ['all'], condition: 'always' },
+        { name: 'Regnbukser', category: 'Udendørs', who: ['all'], condition: 'always' },
+        { name: 'Solhat / kasket', category: 'Udendørs', who: [m_id, g_id, l_id, s_id], condition: 'summer' },
+        { name: 'Hue', category: 'Udendørs', who: ['all'], condition: 'winter' },
+        { name: 'Handsker', category: 'Udendørs', who: ['all'], condition: 'winter' },
+        { name: 'Halstørklæde', category: 'Udendørs', who: ['all'], condition: 'winter' },
+        { name: 'Vinterjakke', category: 'Udendørs', who: ['all'], condition: 'winter' },
+        { name: 'Flyverdragt', category: 'Udendørs', who: ['children'], condition: 'winter' },
 
-  // Danish labels for the raw-data table (code uses English tokens).
-  const CONDITION_LABEL = { always:'altid', summer:'sommer', winter:'vinter', active:'aktiv ferie', summer_or_warm:'sommer eller ferieland' };
-  const WHO_LABEL = { all:'alle', children:'børn', infants:'små' };
+        // Fodtøj
+        { name: 'Gummistøvler', category: 'Fodtøj', who: ['all'], condition: 'always' },
+        { name: 'Sandaler', category: 'Fodtøj', who: ['all'], condition: 'summer' },
+        { name: 'Sko', category: 'Fodtøj', who: ['all'], condition: 'always' },
+        { name: 'Indesko', category: 'Fodtøj', who: ['all'], condition: 'always' },
+        { name: 'Vandresko', category: 'Fodtøj', who: ['all'], condition: 'active' },
 
-/* =========================================================================
+        // Badeudstyr
+        { name: 'Håndklæder', category: 'Badeudstyr', who: ['all'], condition: 'always' },
+        { name: 'Strand-/badelandshåndklæde', category: 'Badeudstyr', who: ['all'], condition: 'summer_or_warm' },
+        { name: 'Badetøj', category: 'Badeudstyr', who: ['all'], condition: 'summer_or_warm' },
+        { name: 'Dykkerbriller', category: 'Badeudstyr', who: ['all'], condition: 'summer_or_warm' },
+
+        // Toiletsager
+        { name: 'Tandbørstehoved', category: toilet, who: ['all'], condition: 'always' },
+        { name: 'Tandbørste', category: toilet, who: ['all'], condition: 'always' },
+        { name: 'Deodorant', category: toilet, who: [j_id, m_id], condition: 'always' },
+        { name: 'Bleer', category: toilet, who: ['infants'], condition: 'always', perDay: true },
+
+        // Fælles (delt med hele familien) — grupperes efter kategori
+        // Toilet
+        { name: 'El-Tandbørste', category: toilet, who: ['all'], condition: 'always', shared: 'family' },
+        { name: 'Neglesaks', category: toilet, who: ['all'], condition: 'always', shared: 'family' },
+        { name: 'Solcreme', category: toilet, who: ['all'], condition: 'summer', shared: 'family' },
+        { name: 'Tandbørste-oplader', category: toilet, who: ['all'], condition: 'always', shared: 'family' },
+
+        // Underholdning
+        { name: 'Bøger', category: 'Underholdning', who: ['all'], condition: 'always', shared: 'family' },
+        { name: 'Spil', category: 'Underholdning', who: ['all'], condition: 'always', shared: 'family' },
+        { name: 'Kortspil', category: 'Underholdning', who: ['all'], condition: 'always', shared: 'family' },
+        { name: 'Tegnegrej', category: 'Underholdning', who: ['all'], condition: 'always', shared: 'family' },
+
+        // Bil (delt med bilen) — grupperes efter kategori; ret/slet frit
+        { name: 'Snacks', category: 'Forplejning', who: ['all'], condition: 'always', shared: 'car' },
+        { name: 'Vand', category: 'Forplejning', who: ['all'], condition: 'always', shared: 'car' },
+        { name: 'Termokande (kaffe/te)', category: 'Forplejning', who: ['all'], condition: 'always', shared: 'car' },
+        { name: 'Affaldsposer', category: 'Praktisk', who: ['all'], condition: 'always', shared: 'car' },
+        { name: 'Vådservietter', category: 'Praktisk', who: ['all'], condition: 'always', shared: 'car' },
+        { name: 'Telefonoplader (bil)', category: 'Praktisk', who: ['all'], condition: 'always', shared: 'car' },
+        { name: 'Puder & tæpper', category: 'Hygge', who: ['all'], condition: 'always', shared: 'car' },
+        { name: 'Rejsespil', category: 'Hygge', who: ['all'], condition: 'always', shared: 'car' },
+      ];
+
+      // Preferred display order for categories. Any category used by an item but
+      // missing here is appended automatically (see groupByCategory) — so nothing
+      // is ever hidden just because it is not listed.
+      const CATEGORIES = [
+        equipment, // Udstyr
+        'Tøj',
+        'Udendørs',
+        'Fodtøj',
+        'Badeudstyr',
+        'Toiletsager',
+        'Pleje',
+        'Elektronik',
+        'Underholdning',
+        'Forplejning',
+        'Praktisk',
+        'Hygge',
+      ];
+
+      // Shared buckets get their own tab, like a person but for the whole group.
+      const SHARED_BUCKETS = [
+        {
+          id: 'family',
+          label: '🧺 Fælles',
+          heading: 'Fælles / delt',
+          rowHint: 'fælles for hele familien',
+          emptyMsg: 'Ingen fælles ting for denne tur.',
+        },
+        { id: 'car', label: '🚗 Bil', heading: 'Bil', rowHint: 'til bilen', emptyMsg: 'Ingen bil-ting for denne tur.' },
+      ];
+
+      // Danish labels for the raw-data table (code uses English tokens).
+      const CONDITION_LABEL = {
+        always: 'altid',
+        summer: 'sommer',
+        winter: 'vinter',
+        active: 'aktiv ferie',
+        summer_or_warm: 'sommer eller ferieland',
+      };
+      const WHO_LABEL = { all: 'alle', children: 'børn', infants: 'små' };
+
+      /* =========================================================================
    2) STATE  (persisted in localStorage)
    people: [{ id, name, going, child, infant }]
    count:  { itemName: { personId | sharedPid : packedCount (0+) } }
    ========================================================================= */
-  const STATE_KEY = 'smart-packing-v6';
+      const STATE_KEY = 'smart-packing-v7';
 
-  function freshPeople(){
-    return DEFAULT_PEOPLE.map(function(p){ return { id:p.id, name:p.name, going:true, child:p.child, infant:p.infant }; });
-  }
-  function defaultState(){
-    return { people:freshPeople(), season:'summer', warmDestination:false, active:false, days:7, count:{} };
-  }
-  function slug(name){
-    var s=(''+name).toLowerCase().replace(/[^a-z0-9æøå]+/g,'-').replace(/^-+|-+$/g,'');
-    return s || 'person';
-  }
-  // Accepts both the new English shape and older Danish exports.
-  function mergeState(s){
-    var d=defaultState();
-    if(!s || typeof s!=='object') return d;
-
-    var rawPeople = Array.isArray(s.people) ? s.people : (Array.isArray(s.personer) ? s.personer : null);
-    var people;
-    if(rawPeople){
-      var used={};
-      people = rawPeople.filter(function(p){ return p && typeof p==='object' && (''+(p.name!=null?p.name:(p.navn||''))).trim(); })
-        .map(function(p){
-          var name=(''+(p.name!=null?p.name:p.navn)).trim();
-          var id=(''+(p.id||'')).trim() || slug(name);
-          while(used[id]) id=id+'-2';
-          used[id]=true;
-          var going = (p.going!==undefined) ? p.going!==false : (p.med!==undefined ? p.med!==false : true);
-          var child = !!(p.child!==undefined ? p.child : p.barn);
-          var infant = !!(p.infant!==undefined ? p.infant : p.lille);
-          return { id:id, name:name, going:going, child:child, infant:infant };
+      function freshPeople() {
+        return DEFAULT_PEOPLE.map(function (p) {
+          return { id: p.id, name: p.name, going: true, child: p.child, infant: p.infant };
         });
-      if(!people.length) people=d.people;
-    } else if(s.med || s.barn || s.lille){
-      // Very old export: fixed roster + maps
-      people = DEFAULT_PEOPLE.map(function(p){
-        return { id:p.id, name:p.name,
-          going:(s.med && s.med[p.id]!==undefined) ? !!s.med[p.id] : true,
-          child:(s.barn && s.barn[p.id]!==undefined) ? !!s.barn[p.id] : p.child,
-          infant:(s.lille && s.lille[p.id]!==undefined) ? !!s.lille[p.id] : p.infant };
-      });
-    } else { people=d.people; }
-
-    var season = s.season || s.saeson || d.season;
-    var warm = (s.warmDestination!==undefined) ? !!s.warmDestination : !!s.ferieland;
-    var active = (s.active!==undefined) ? !!s.active : !!s.aktiv;
-    var days = s.days || s.dage || 7;
-    var count = (s.count && typeof s.count==='object') ? s.count : {};
-
-    // Migrate legacy shared counts ('_delt' -> '_family')
-    ITEMS.forEach(function(it){
-      if(it.shared==='family' && count[it.name] && count[it.name]._delt!=null && count[it.name]._family==null){
-        count[it.name]._family=count[it.name]._delt;
       }
-    });
+      function defaultState() {
+        return { people: freshPeople(), season: 'summer', warmDestination: false, active: false, days: 7, count: {} };
+      }
+      function slug(name) {
+        var s = ('' + name)
+          .toLowerCase()
+          .replace(/[^a-z0-9æøå]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+        return s || 'person';
+      }
+      // Accepts both the new English shape and older Danish exports.
+      function mergeState(s) {
+        var d = defaultState();
+        if (!s || typeof s !== 'object') return d;
 
-    return { people:people, season:season, warmDestination:warm, active:active, days:days, count:count };
-  }
-  function loadState(){
-    try{ var raw=localStorage.getItem(STATE_KEY); return raw ? mergeState(JSON.parse(raw)) : defaultState(); }
-    catch(e){ return defaultState(); }
-  }
-  function saveState(){ try{ localStorage.setItem(STATE_KEY, JSON.stringify(state)); }catch(e){} }
+        var rawPeople = Array.isArray(s.people) ? s.people : Array.isArray(s.personer) ? s.personer : null;
+        var people;
+        if (rawPeople) {
+          var used = {};
+          people = rawPeople
+            .filter(function (p) {
+              return p && typeof p === 'object' && ('' + (p.name != null ? p.name : p.navn || '')).trim();
+            })
+            .map(function (p) {
+              var name = ('' + (p.name != null ? p.name : p.navn)).trim();
+              var id = ('' + (p.id || '')).trim() || slug(name);
+              while (used[id]) id = id + '-2';
+              used[id] = true;
+              var going = p.going !== undefined ? p.going !== false : p.med !== undefined ? p.med !== false : true;
+              var child = !!(p.child !== undefined ? p.child : p.barn);
+              var infant = !!(p.infant !== undefined ? p.infant : p.lille);
+              return { id: id, name: name, going: going, child: child, infant: infant };
+            });
+          if (!people.length) people = d.people;
+        } else if (s.med || s.barn || s.lille) {
+          people = DEFAULT_PEOPLE.map(function (p) {
+            return {
+              id: p.id,
+              name: p.name,
+              going: s.med && s.med[p.id] !== undefined ? !!s.med[p.id] : true,
+              child: s.barn && s.barn[p.id] !== undefined ? !!s.barn[p.id] : p.child,
+              infant: s.lille && s.lille[p.id] !== undefined ? !!s.lille[p.id] : p.infant,
+            };
+          });
+        } else {
+          people = d.people;
+        }
 
-  var state = loadState();
-  var currentView = null;   // 'person:<id>' | 'shared:<bucketId>' | 'overview'
+        var season = s.season || s.saeson || d.season;
+        var warm = s.warmDestination !== undefined ? !!s.warmDestination : !!s.ferieland;
+        var active = s.active !== undefined ? !!s.active : !!s.aktiv;
+        var days = s.days || s.dage || 7;
+        var count = s.count && typeof s.count === 'object' ? s.count : {};
 
-/* =========================================================================
+        // Migrate legacy shared counts ('_delt' -> '_family')
+        ITEMS.forEach(function (it) {
+          if (
+            it.shared === 'family' &&
+            count[it.name] &&
+            count[it.name]._delt != null &&
+            count[it.name]._family == null
+          ) {
+            count[it.name]._family = count[it.name]._delt;
+          }
+        });
+
+        return { people: people, season: season, warmDestination: warm, active: active, days: days, count: count };
+      }
+      function loadState() {
+        try {
+          var raw = localStorage.getItem(STATE_KEY);
+          return raw ? mergeState(JSON.parse(raw)) : defaultState();
+        } catch (e) {
+          return defaultState();
+        }
+      }
+      function saveState() {
+        try {
+          localStorage.setItem(STATE_KEY, JSON.stringify(state));
+        } catch (e) {}
+      }
+
+      var state = loadState();
+      var currentView = null; // 'person:<id>' | 'shared:<bucketId>' | 'overview'
+
+      /* =========================================================================
    3) LOGIC
    ========================================================================= */
-  function tripDays(){ return Math.max(1, parseInt(state.days,10)||1); }
-  function nameOf(p){ return p.name || '(uden navn)'; }
+      function tripDays() {
+        return Math.max(1, parseInt(state.days, 10) || 1);
+      }
+      function nameOf(p) {
+        return p.name || '(uden navn)';
+      }
 
-  function conditionMet(c){
-    switch(c){
-      case 'always':          return true;
-      case 'summer':          return state.season==='summer';
-      case 'winter':          return state.season==='winter';
-      case 'active':          return state.active;
-      case 'summer_or_warm':  return state.season==='summer' || state.warmDestination;
-      default:                return false;
-    }
-  }
-  function activePeople(){ return state.people.filter(function(p){ return p.going; }); }
+      function conditionMet(c) {
+        switch (c) {
+          case 'always':
+            return true;
+          case 'summer':
+            return state.season === 'summer';
+          case 'winter':
+            return state.season === 'winter';
+          case 'active':
+            return state.active;
+          case 'summer_or_warm':
+            return state.season === 'summer' || state.warmDestination;
+          default:
+            return false;
+        }
+      }
+      function activePeople() {
+        return state.people.filter(function (p) {
+          return p.going;
+        });
+      }
 
-  function itemAppliesTo(it, p){
-    if(it.shared) return false;
-    if(!conditionMet(it.condition)) return false;
-    var who=it.who;
-    if(who.indexOf('all')>-1) return true;
-    if(who.indexOf('children')>-1) return p.child;
-    if(who.indexOf('infants')>-1) return p.infant;
-    return who.indexOf(p.id)>-1;
-  }
-  function itemsForPerson(p){ return ITEMS.filter(function(it){ return itemAppliesTo(it,p); }); }
-  function sharedItems(bucketId){ return ITEMS.filter(function(it){ return it.shared===bucketId && conditionMet(it.condition); }); }
-  function sharedPid(bucketId){ return '_'+bucketId; }
-  function bucketMeta(id){ return SHARED_BUCKETS.filter(function(b){ return b.id===id; })[0]; }
+      function itemAppliesTo(it, p) {
+        if (it.shared) return false;
+        if (!conditionMet(it.condition)) return false;
+        var who = it.who;
+        if (who.indexOf('all') > -1) return true;
+        if (who.indexOf('children') > -1) return p.child;
+        if (who.indexOf('infants') > -1) return p.infant;
+        return who.indexOf(p.id) > -1;
+      }
+      function itemsForPerson(p) {
+        return ITEMS.filter(function (it) {
+          return itemAppliesTo(it, p);
+        });
+      }
+      function sharedItems(bucketId) {
+        return ITEMS.filter(function (it) {
+          return it.shared === bucketId && conditionMet(it.condition);
+        });
+      }
+      function sharedPid(bucketId) {
+        return '_' + bucketId;
+      }
+      function bucketMeta(id) {
+        return SHARED_BUCKETS.filter(function (b) {
+          return b.id === id;
+        })[0];
+      }
 
-  function suggestion(it){ return it.shared ? 1 : (it.perDay ? tripDays() : 1); }
-  function getCount(it, pid){ var m=state.count[it.name]; return (m && m[pid]!=null) ? m[pid] : 0; }
-  function setCount(it, pid, n){ if(!state.count[it.name]) state.count[it.name]={}; state.count[it.name][pid]=Math.max(0,n); }
+      function suggestion(it) {
+        return it.shared ? 1 : it.perDay ? tripDays() : 1;
+      }
+      // Counter = scales (perDay) or explicit count:true. Otherwise it's a yes/no item.
+      function isCounter(it) {
+        return !!(it.count || it.perDay);
+      }
+      function getCount(it, pid) {
+        var m = state.count[it.name];
+        return m && m[pid] != null ? m[pid] : 0;
+      }
+      function setCount(it, pid, n) {
+        if (!state.count[it.name]) state.count[it.name] = {};
+        state.count[it.name][pid] = Math.max(0, n);
+      }
 
-  function personProgress(p){
-    var items=itemsForPerson(p);
-    return { total:items.length, packed:items.filter(function(it){ return getCount(it,p.id)>0; }).length };
-  }
-  function sharedProgress(bucketId){
-    var items=sharedItems(bucketId), pid=sharedPid(bucketId);
-    return { total:items.length, packed:items.filter(function(it){ return getCount(it,pid)>0; }).length };
-  }
+      // Group items by category — CATEGORIES order first, then any extra categories
+      // in first-seen order. Guarantees no item is ever hidden.
+      function groupByCategory(items) {
+        var order = CATEGORIES.slice(),
+          groups = {};
+        items.forEach(function (it) {
+          var c = it.category || 'Andet';
+          if (!groups[c]) {
+            groups[c] = [];
+            if (order.indexOf(c) === -1) order.push(c);
+          }
+          groups[c].push(it);
+        });
+        return order
+          .filter(function (c) {
+            return groups[c];
+          })
+          .map(function (c) {
+            return { category: c, items: groups[c] };
+          });
+      }
 
-/* =========================================================================
+      function personProgress(p) {
+        var items = itemsForPerson(p);
+        return {
+          total: items.length,
+          packed: items.filter(function (it) {
+            return getCount(it, p.id) > 0;
+          }).length,
+        };
+      }
+      function sharedProgress(bucketId) {
+        var items = sharedItems(bucketId),
+          pid = sharedPid(bucketId);
+        return {
+          total: items.length,
+          packed: items.filter(function (it) {
+            return getCount(it, pid) > 0;
+          }).length,
+        };
+      }
+
+      /* =========================================================================
    4) RENDERING
    ========================================================================= */
-  function el(tag, cls, txt){ var e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e; }
+      function el(tag, cls, txt) {
+        var e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (txt != null) e.textContent = txt;
+        return e;
+      }
 
-  function renderPeople(){
-    var box=document.getElementById('people'); box.textContent='';
-    state.people.forEach(function(p){
-      var row=el('div','person-row');
+      function categorySection(category, items, pidFor) {
+        var sec = el('div', 'cat');
+        var h = el('h3');
+        h.appendChild(document.createTextNode(category));
+        h.appendChild(el('span', 'count', ' · ' + items.length));
+        sec.appendChild(h);
+        items.forEach(function (it) {
+          sec.appendChild(tallyRow(it, pidFor(it), null));
+        });
+        return sec;
+      }
 
-      var left=el('div','person-name');
-      var going=el('input'); going.type='checkbox'; going.checked=!!p.going; going.title='Med på turen';
-      going.addEventListener('change', function(){ p.going=going.checked; refresh(); });
-      var name=el('input','name-input'); name.type='text'; name.value=p.name; name.setAttribute('aria-label','Navn');
-      name.addEventListener('input', function(){ p.name=name.value; saveState(); renderTabs(); renderView(); });
-      left.appendChild(going); left.appendChild(name);
+      function renderPeople() {
+        var box = document.getElementById('people');
+        box.textContent = '';
+        state.people.forEach(function (p) {
+          var row = el('div', 'person-row');
 
-      var right=el('div','prow-right');
-      var flags=el('div','flags');
-      flags.appendChild(flagToggle(p,'child','👶'));
-      flags.appendChild(flagToggle(p,'infant','🍼'));
-      var del=el('button','del','🗑'); del.type='button'; del.title='Fjern person';
-      del.addEventListener('click', function(){ removePerson(p); });
-      right.appendChild(flags); right.appendChild(del);
-
-      row.appendChild(left); row.appendChild(right);
-      box.appendChild(row);
-    });
-  }
-  function flagToggle(p, key, label){
-    var l=el('label','flag'); l.title=(key==='child' ? 'Barn' : 'Lille (ble-alder)');
-    var cb=el('input'); cb.type='checkbox'; cb.checked=!!p[key];
-    cb.addEventListener('change', function(){ p[key]=cb.checked; refresh(); });
-    l.appendChild(cb); l.appendChild(document.createTextNode(label)); return l;
-  }
-  function newId(name){
-    var base=slug(name), id=base, n=2, used={};
-    state.people.forEach(function(p){ used[p.id]=true; });
-    while(used[id]){ id=base+'-'+n; n++; }
-    return id;
-  }
-  function addPerson(){
-    var inp=document.getElementById('newPersonName');
-    var name=(inp.value||'').trim(); if(!name) return;
-    var id=newId(name);
-    state.people.push({ id:id, name:name, going:true, child:false, infant:false });
-    inp.value=''; currentView='person:'+id;
-    renderPeople(); refresh();
-  }
-  function removePerson(p){
-    if(!window.confirm('Fjern '+nameOf(p)+' og alle deres antal?')) return;
-    state.people=state.people.filter(function(x){ return x!==p; });
-    Object.keys(state.count).forEach(function(itemName){ if(state.count[itemName]) delete state.count[itemName][p.id]; });
-    if(currentView==='person:'+p.id) currentView=null;
-    renderPeople(); refresh();
-  }
-
-  function ensureView(){
-    var people=activePeople();
-    if(currentView){
-      if(currentView.indexOf('person:')===0){
-        var pid=currentView.slice(7);
-        if(people.some(function(p){ return p.id===pid; })) return;
-      } else if(currentView.indexOf('shared:')===0){
-        if(sharedItems(currentView.slice(7)).length) return;
-      } else if(currentView==='overview'){ return; }
-    }
-    if(people.length){ currentView='person:'+people[0].id; return; }
-    for(var i=0;i<SHARED_BUCKETS.length;i++){ if(sharedItems(SHARED_BUCKETS[i].id).length){ currentView='shared:'+SHARED_BUCKETS[i].id; return; } }
-    currentView='overview';
-  }
-
-  function renderTabs(){
-    var host=document.getElementById('tabs'); host.textContent='';
-    var people=activePeople();
-    people.forEach(function(p){
-      var pr=personProgress(p);
-      var b=el('button','tab'+(currentView==='person:'+p.id?' active':''), nameOf(p)+' ('+pr.packed+'/'+pr.total+')');
-      b.addEventListener('click', function(){ currentView='person:'+p.id; renderTabs(); renderView(); });
-      host.appendChild(b);
-    });
-    SHARED_BUCKETS.forEach(function(bucket){
-      if(!sharedItems(bucket.id).length) return;
-      var pr=sharedProgress(bucket.id);
-      var b=el('button','tab'+(currentView==='shared:'+bucket.id?' active':''), bucket.label+' ('+pr.packed+'/'+pr.total+')');
-      b.addEventListener('click', function(){ currentView='shared:'+bucket.id; renderTabs(); renderView(); });
-      host.appendChild(b);
-    });
-    var o=el('button','tab'+(currentView==='overview'?' active':''), '📊 Overblik');
-    o.addEventListener('click', function(){ currentView='overview'; renderTabs(); renderView(); });
-    host.appendChild(o);
-  }
-
-  function renderView(){
-    ensureView();
-    if(currentView.indexOf('person:')===0) renderPerson(currentView.slice(7));
-    else if(currentView.indexOf('shared:')===0) renderShared(currentView.slice(7));
-    else renderOverview();
-  }
-
-  // One row with a counter that starts at 0.  Order: + (add) left, − (remove) right.
-  function tallyRow(it, pid, hintText){
-    var row=el('div','item'); if(getCount(it,pid)>0) row.classList.add('has');
-    var box=el('div','stepper');
-    var plus=el('button',null,'+'); plus.type='button';
-    var inp=el('input'); inp.type='number'; inp.min='0'; inp.step='1'; inp.value=getCount(it,pid);
-    var minus=el('button',null,'−'); minus.type='button';
-    function commit(n){ n=Math.max(0,n); setCount(it,pid,n); inp.value=n; row.classList.toggle('has',n>0); saveState(); renderTabs(); updateSummary(); }
-    plus.addEventListener('click', function(){ commit(getCount(it,pid)+1); });
-    minus.addEventListener('click', function(){ commit(getCount(it,pid)-1); });
-    inp.addEventListener('input', function(){ var n=Math.max(0,parseInt(inp.value,10)||0); setCount(it,pid,n); row.classList.toggle('has',n>0); saveState(); renderTabs(); updateSummary(); });
-    box.appendChild(plus); box.appendChild(inp); box.appendChild(minus);
-
-    var body=el('div','body');
-    body.appendChild(el('div','name',it.name));
-    var hint = hintText || (suggestion(it)>1 ? 'forslag: '+suggestion(it) : '');
-    if(hint) body.appendChild(el('div','who',hint));
-
-    row.appendChild(box); row.appendChild(body);
-    return row;
-  }
-
-  function renderPerson(pid){
-    var host=document.getElementById('view'); host.textContent='';
-    var p=activePeople().filter(function(x){ return x.id===pid; })[0];
-    if(!p){ host.appendChild(el('div','empty','Vælg en person.')); return; }
-    var items=itemsForPerson(p);
-    if(!items.length){ host.appendChild(el('div','empty',nameOf(p)+' har ingen varer for denne tur.')); return; }
-
-    host.appendChild(fillButton(items, function(it){ return p.id; }));
-
-    CATEGORIES.forEach(function(cat){
-      var inCat=items.filter(function(it){ return it.category===cat; }); if(!inCat.length) return;
-      var sec=el('div','cat');
-      var h=el('h3'); h.appendChild(document.createTextNode(cat)); h.appendChild(el('span','count',' · '+inCat.length)); sec.appendChild(h);
-      inCat.forEach(function(it){ sec.appendChild(tallyRow(it,p.id,null)); });
-      host.appendChild(sec);
-    });
-  }
-
-  function renderShared(bucketId){
-    var host=document.getElementById('view'); host.textContent='';
-    var bucket=bucketMeta(bucketId);
-    var items=bucket ? sharedItems(bucketId) : [];
-    if(!bucket || !items.length){ host.appendChild(el('div','empty', bucket?bucket.emptyMsg:'Ukendt fane.')); return; }
-    var pid=sharedPid(bucketId);
-
-    host.appendChild(fillButton(items, function(it){ return pid; }));
-
-    var sec=el('div','cat');
-    var h=el('h3'); h.appendChild(document.createTextNode(bucket.heading)); h.appendChild(el('span','count',' · '+items.length)); sec.appendChild(h);
-    items.forEach(function(it){ sec.appendChild(tallyRow(it,pid,bucket.rowHint)); });
-    host.appendChild(sec);
-  }
-
-  // "Udfyld forslag" button — fills empty counters with the suggested amount.
-  function fillButton(items, pidFor){
-    var btn=el('button','fill','✨ Udfyld forslag'); btn.type='button';
-    btn.addEventListener('click', function(){
-      items.forEach(function(it){ var pid=pidFor(it); if(getCount(it,pid)===0) setCount(it,pid,suggestion(it)); });
-      saveState(); renderTabs(); renderView(); updateSummary();
-    });
-    return btn;
-  }
-
-  function renderOverview(){
-    var host=document.getElementById('view'); host.textContent='';
-    var people=activePeople();
-    if(!people.length){ host.appendChild(el('div','empty','Vælg mindst én person.')); return; }
-    var rows=ITEMS.filter(function(it){ return !it.shared && people.some(function(p){ return itemAppliesTo(it,p); }); });
-    if(!rows.length){ host.appendChild(el('div','empty','Ingen varer matcher turen.')); return; }
-
-    var scroll=el('div','scrollx');
-    var tbl=el('table','matrix');
-    var head=el('tr');
-    head.appendChild(el('th',null,'Vare'));
-    people.forEach(function(p){ head.appendChild(el('th',null,nameOf(p))); });
-    head.appendChild(el('th',null,'Total'));
-    tbl.appendChild(head);
-
-    rows.forEach(function(it){
-      var tr=el('tr');
-      var c0=el('td'); c0.appendChild(el('b',null,it.name)); tr.appendChild(c0);
-      var totCell=el('td','tot');
-      function recalc(){ var t=0; people.forEach(function(p){ if(itemAppliesTo(it,p)) t+=getCount(it,p.id); }); totCell.textContent=t; }
-      people.forEach(function(p){
-        var td=el('td');
-        if(itemAppliesTo(it,p)){
-          var inp=el('input','cell'+(getCount(it,p.id)>0?' has':'')); inp.type='number'; inp.min='0'; inp.step='1'; inp.value=getCount(it,p.id);
-          inp.addEventListener('input', function(){
-            var n=Math.max(0,parseInt(inp.value,10)||0); setCount(it,p.id,n);
-            inp.className='cell'+(n>0?' has':''); saveState(); recalc(); renderTabs(); updateSummary();
+          var left = el('div', 'person-name');
+          var going = el('input');
+          going.type = 'checkbox';
+          going.checked = !!p.going;
+          going.title = 'Med på turen';
+          going.addEventListener('change', function () {
+            p.going = going.checked;
+            refresh();
           });
-          td.appendChild(inp);
-        } else { td.appendChild(el('span','muted','·')); }
-        tr.appendChild(td);
-      });
-      recalc(); tr.appendChild(totCell); tbl.appendChild(tr);
-    });
-    scroll.appendChild(tbl); host.appendChild(scroll);
-    host.appendChild(el('p','legend','Tæl op direkte i cellerne. Fælles- og bil-ting står under deres egne faner.'));
-  }
+          var name = el('input', 'name-input');
+          name.type = 'text';
+          name.value = p.name;
+          name.setAttribute('aria-label', 'Navn');
+          name.addEventListener('input', function () {
+            p.name = name.value;
+            saveState();
+            renderTabs();
+            renderView();
+          });
+          left.appendChild(going);
+          left.appendChild(name);
 
-  function updateSummary(){
-    var offered=0, started=0, total=0;
-    activePeople().forEach(function(p){ itemsForPerson(p).forEach(function(it){ offered++; var n=getCount(it,p.id); if(n>0){ started++; total+=n; } }); });
-    SHARED_BUCKETS.forEach(function(bucket){ var pid=sharedPid(bucket.id); sharedItems(bucket.id).forEach(function(it){ offered++; var n=getCount(it,pid); if(n>0){ started++; total+=n; } }); });
-    var r=document.getElementById('summary'); r.textContent='';
-    var b1=el('span'); b1.innerHTML='<b>'+total+'</b> ting pakket'; r.appendChild(b1);
-    var b2=el('span','muted'); b2.textContent=started+' / '+offered+' varer påbegyndt'; r.appendChild(b2);
-    document.getElementById('barFill').style.inlineSize=(offered?Math.round(started/offered*100):0)+'%';
-  }
+          var right = el('div', 'prow-right');
+          var flags = el('div', 'flags');
+          flags.appendChild(flagToggle(p, 'child', '👶'));
+          flags.appendChild(flagToggle(p, 'infant', '🍼'));
+          var del = el('button', 'del', '🗑');
+          del.type = 'button';
+          del.title = 'Fjern person';
+          del.addEventListener('click', function () {
+            removePerson(p);
+          });
+          right.appendChild(flags);
+          right.appendChild(del);
 
-  function renderRawData(){
-    var t=document.getElementById('rawData');
-    var head='<tr><th>Vare</th><th>Kategori</th><th>Hvem</th><th>Betingelse</th><th>Forslag</th></tr>';
-    var rows=ITEMS.map(function(it){
-      var sug = it.shared ? 'delt (1)' : (it.perDay ? 'dage / pers.' : '1 / pers.');
-      var who = it.who.map(function(w){ return WHO_LABEL[w] || w; }).join(', ');
-      var cond = CONDITION_LABEL[it.condition] || it.condition;
-      return '<tr><td>'+it.name+'</td><td>'+it.category+'</td><td>'+who+
-             "</td><td><span class='tag'>"+cond+'</span></td><td>'+sug+'</td></tr>';
-    }).join('');
-    t.innerHTML=head+rows;
-  }
+          row.appendChild(left);
+          row.appendChild(right);
+          box.appendChild(row);
+        });
+      }
+      function flagToggle(p, key, label) {
+        var l = el('label', 'flag');
+        l.title = key === 'child' ? 'Barn' : 'Lille (ble-alder)';
+        var cb = el('input');
+        cb.type = 'checkbox';
+        cb.checked = !!p[key];
+        cb.addEventListener('change', function () {
+          p[key] = cb.checked;
+          refresh();
+        });
+        l.appendChild(cb);
+        l.appendChild(document.createTextNode(label));
+        return l;
+      }
+      function newId(name) {
+        var base = slug(name),
+          id = base,
+          n = 2,
+          used = {};
+        state.people.forEach(function (p) {
+          used[p.id] = true;
+        });
+        while (used[id]) {
+          id = base + '-' + n;
+          n++;
+        }
+        return id;
+      }
+      function addPerson() {
+        var inp = document.getElementById('newPersonName');
+        var name = (inp.value || '').trim();
+        if (!name) return;
+        var id = newId(name);
+        state.people.push({ id: id, name: name, going: true, child: false, infant: false });
+        inp.value = '';
+        currentView = 'person:' + id;
+        renderPeople();
+        refresh();
+      }
+      function removePerson(p) {
+        if (!window.confirm('Fjern ' + nameOf(p) + ' og alle deres antal?')) return;
+        state.people = state.people.filter(function (x) {
+          return x !== p;
+        });
+        Object.keys(state.count).forEach(function (itemName) {
+          if (state.count[itemName]) delete state.count[itemName][p.id];
+        });
+        if (currentView === 'person:' + p.id) currentView = null;
+        renderPeople();
+        refresh();
+      }
 
-/* =========================================================================
+      function ensureView() {
+        var people = activePeople();
+        if (currentView) {
+          if (currentView.indexOf('person:') === 0) {
+            var pid = currentView.slice(7);
+            if (
+              people.some(function (p) {
+                return p.id === pid;
+              })
+            )
+              return;
+          } else if (currentView.indexOf('shared:') === 0) {
+            if (sharedItems(currentView.slice(7)).length) return;
+          } else if (currentView === 'overview') {
+            return;
+          }
+        }
+        if (people.length) {
+          currentView = 'person:' + people[0].id;
+          return;
+        }
+        for (var i = 0; i < SHARED_BUCKETS.length; i++) {
+          if (sharedItems(SHARED_BUCKETS[i].id).length) {
+            currentView = 'shared:' + SHARED_BUCKETS[i].id;
+            return;
+          }
+        }
+        currentView = 'overview';
+      }
+
+      function renderTabs() {
+        var host = document.getElementById('tabs');
+        host.textContent = '';
+        var people = activePeople();
+        people.forEach(function (p) {
+          var pr = personProgress(p);
+          var b = el(
+            'button',
+            'tab' + (currentView === 'person:' + p.id ? ' active' : ''),
+            nameOf(p) + ' (' + pr.packed + '/' + pr.total + ')',
+          );
+          b.addEventListener('click', function () {
+            currentView = 'person:' + p.id;
+            renderTabs();
+            renderView();
+          });
+          host.appendChild(b);
+        });
+        SHARED_BUCKETS.forEach(function (bucket) {
+          if (!sharedItems(bucket.id).length) return;
+          var pr = sharedProgress(bucket.id);
+          var b = el(
+            'button',
+            'tab' + (currentView === 'shared:' + bucket.id ? ' active' : ''),
+            bucket.label + ' (' + pr.packed + '/' + pr.total + ')',
+          );
+          b.addEventListener('click', function () {
+            currentView = 'shared:' + bucket.id;
+            renderTabs();
+            renderView();
+          });
+          host.appendChild(b);
+        });
+        var o = el('button', 'tab' + (currentView === 'overview' ? ' active' : ''), '📊 Overblik');
+        o.addEventListener('click', function () {
+          currentView = 'overview';
+          renderTabs();
+          renderView();
+        });
+        host.appendChild(o);
+      }
+
+      function renderView() {
+        ensureView();
+        if (currentView.indexOf('person:') === 0) renderPerson(currentView.slice(7));
+        else if (currentView.indexOf('shared:') === 0) renderShared(currentView.slice(7));
+        else renderOverview();
+      }
+
+      // One item row. Counter items get a +/− stepper; yes/no items get a checkbox.
+      function tallyRow(it, pid, hintText) {
+        var row = el('div', 'item');
+        if (getCount(it, pid) > 0) row.classList.add('has');
+        var control;
+
+        if (isCounter(it)) {
+          // Numeric counter: + (add) left, − (remove) right, starts at 0.
+          var box = el('div', 'stepper');
+          var plus = el('button', null, '+');
+          plus.type = 'button';
+          var inp = el('input');
+          inp.type = 'number';
+          inp.min = '0';
+          inp.step = '1';
+          inp.value = getCount(it, pid);
+          var minus = el('button', null, '−');
+          minus.type = 'button';
+          var commit = function (n) {
+            n = Math.max(0, n);
+            setCount(it, pid, n);
+            inp.value = n;
+            row.classList.toggle('has', n > 0);
+            saveState();
+            renderTabs();
+            updateSummary();
+          };
+          plus.addEventListener('click', function () {
+            commit(getCount(it, pid) + 1);
+          });
+          minus.addEventListener('click', function () {
+            commit(getCount(it, pid) - 1);
+          });
+          inp.addEventListener('input', function () {
+            var n = Math.max(0, parseInt(inp.value, 10) || 0);
+            setCount(it, pid, n);
+            row.classList.toggle('has', n > 0);
+            saveState();
+            renderTabs();
+            updateSummary();
+          });
+          box.appendChild(plus);
+          box.appendChild(inp);
+          box.appendChild(minus);
+          control = box;
+        } else {
+          // Yes/no: a single checkbox (packed or not).
+          var wrap = el('label', 'check');
+          var cb = el('input');
+          cb.type = 'checkbox';
+          cb.checked = getCount(it, pid) > 0;
+          cb.addEventListener('change', function () {
+            setCount(it, pid, cb.checked ? 1 : 0);
+            row.classList.toggle('has', cb.checked);
+            saveState();
+            renderTabs();
+            updateSummary();
+          });
+          wrap.appendChild(cb);
+          control = wrap;
+        }
+
+        var body = el('div', 'body');
+        body.appendChild(el('div', 'name', it.name));
+        var hint = hintText || (isCounter(it) && suggestion(it) > 1 ? 'forslag: ' + suggestion(it) : '');
+        if (hint) body.appendChild(el('div', 'who', hint));
+
+        row.appendChild(control);
+        row.appendChild(body);
+        return row;
+      }
+
+      function renderPerson(pid) {
+        var host = document.getElementById('view');
+        host.textContent = '';
+        var p = activePeople().filter(function (x) {
+          return x.id === pid;
+        })[0];
+        if (!p) {
+          host.appendChild(el('div', 'empty', 'Vælg en person.'));
+          return;
+        }
+        var items = itemsForPerson(p);
+        if (!items.length) {
+          host.appendChild(el('div', 'empty', nameOf(p) + ' har ingen varer for denne tur.'));
+          return;
+        }
+
+        host.appendChild(
+          fillButton(items, function () {
+            return p.id;
+          }),
+        );
+        groupByCategory(items).forEach(function (grp) {
+          host.appendChild(
+            categorySection(grp.category, grp.items, function () {
+              return p.id;
+            }),
+          );
+        });
+      }
+
+      function renderShared(bucketId) {
+        var host = document.getElementById('view');
+        host.textContent = '';
+        var bucket = bucketMeta(bucketId);
+        var items = bucket ? sharedItems(bucketId) : [];
+        if (!bucket || !items.length) {
+          host.appendChild(el('div', 'empty', bucket ? bucket.emptyMsg : 'Ukendt fane.'));
+          return;
+        }
+        var pid = sharedPid(bucketId);
+
+        host.appendChild(
+          fillButton(items, function () {
+            return pid;
+          }),
+        );
+
+        var groups = groupByCategory(items);
+        if (groups.length <= 1) {
+          // Single category → flat list under the bucket heading.
+          host.appendChild(
+            categorySection(bucket.heading, items, function () {
+              return pid;
+            }),
+          );
+        } else {
+          // Multiple categories → one section per category (like the person view).
+          groups.forEach(function (grp) {
+            host.appendChild(
+              categorySection(grp.category, grp.items, function () {
+                return pid;
+              }),
+            );
+          });
+        }
+      }
+
+      // "Udfyld forslag" button — fills empty counters with the suggested amount.
+      function fillButton(items, pidFor) {
+        var btn = el('button', 'fill', '✨ Udfyld forslag');
+        btn.type = 'button';
+        btn.title = 'Forudfylder kun antal-varer (fx dagligt tøj). Ja/nej-varer krydser du selv af.';
+        btn.addEventListener('click', function () {
+          items.forEach(function (it) {
+            if (!isCounter(it)) return;
+            var pid = pidFor(it);
+            if (getCount(it, pid) === 0) setCount(it, pid, suggestion(it));
+          });
+          saveState();
+          renderTabs();
+          renderView();
+          updateSummary();
+        });
+        return btn;
+      }
+
+      function renderOverview() {
+        var host = document.getElementById('view');
+        host.textContent = '';
+        var people = activePeople();
+        if (!people.length) {
+          host.appendChild(el('div', 'empty', 'Vælg mindst én person.'));
+          return;
+        }
+        var rows = ITEMS.filter(function (it) {
+          return (
+            !it.shared &&
+            people.some(function (p) {
+              return itemAppliesTo(it, p);
+            })
+          );
+        });
+        if (!rows.length) {
+          host.appendChild(el('div', 'empty', 'Ingen varer matcher turen.'));
+          return;
+        }
+
+        var scroll = el('div', 'scrollx');
+        var tbl = el('table', 'matrix');
+        var head = el('tr');
+        head.appendChild(el('th', null, 'Vare'));
+        people.forEach(function (p) {
+          head.appendChild(el('th', null, nameOf(p)));
+        });
+        head.appendChild(el('th', null, 'Total'));
+        tbl.appendChild(head);
+
+        rows.forEach(function (it) {
+          var tr = el('tr');
+          var c0 = el('td');
+          c0.appendChild(el('b', null, it.name));
+          tr.appendChild(c0);
+          var totCell = el('td', 'tot');
+          function recalc() {
+            var t = 0;
+            people.forEach(function (p) {
+              if (itemAppliesTo(it, p)) t += getCount(it, p.id);
+            });
+            totCell.textContent = t;
+          }
+          people.forEach(function (p) {
+            var td = el('td');
+            if (itemAppliesTo(it, p)) {
+              if (isCounter(it)) {
+                var inp = el('input', 'cell' + (getCount(it, p.id) > 0 ? ' has' : ''));
+                inp.type = 'number';
+                inp.min = '0';
+                inp.step = '1';
+                inp.value = getCount(it, p.id);
+                inp.addEventListener('input', function () {
+                  var n = Math.max(0, parseInt(inp.value, 10) || 0);
+                  setCount(it, p.id, n);
+                  inp.className = 'cell' + (n > 0 ? ' has' : '');
+                  saveState();
+                  recalc();
+                  renderTabs();
+                  updateSummary();
+                });
+                td.appendChild(inp);
+              } else {
+                var cb = el('input', 'cellcheck');
+                cb.type = 'checkbox';
+                cb.checked = getCount(it, p.id) > 0;
+                cb.addEventListener('change', function () {
+                  setCount(it, p.id, cb.checked ? 1 : 0);
+                  saveState();
+                  recalc();
+                  renderTabs();
+                  updateSummary();
+                });
+                td.appendChild(cb);
+              }
+            } else {
+              td.appendChild(el('span', 'muted', '·'));
+            }
+            tr.appendChild(td);
+          });
+          recalc();
+          tr.appendChild(totCell);
+          tbl.appendChild(tr);
+        });
+        scroll.appendChild(tbl);
+        host.appendChild(scroll);
+        host.appendChild(
+          el('p', 'legend', 'Tæl op direkte i cellerne. Fælles- og bil-ting står under deres egne faner.'),
+        );
+      }
+
+      function updateSummary() {
+        var offered = 0,
+          started = 0,
+          total = 0;
+        activePeople().forEach(function (p) {
+          itemsForPerson(p).forEach(function (it) {
+            offered++;
+            var n = getCount(it, p.id);
+            if (n > 0) {
+              started++;
+              total += n;
+            }
+          });
+        });
+        SHARED_BUCKETS.forEach(function (bucket) {
+          var pid = sharedPid(bucket.id);
+          sharedItems(bucket.id).forEach(function (it) {
+            offered++;
+            var n = getCount(it, pid);
+            if (n > 0) {
+              started++;
+              total += n;
+            }
+          });
+        });
+        var r = document.getElementById('summary');
+        r.textContent = '';
+        var b1 = el('span');
+        b1.innerHTML = '<b>' + total + '</b> ting pakket';
+        r.appendChild(b1);
+        var b2 = el('span', 'muted');
+        b2.textContent = started + ' / ' + offered + ' varer påbegyndt';
+        r.appendChild(b2);
+        document.getElementById('barFill').style.inlineSize =
+          (offered ? Math.round((started / offered) * 100) : 0) + '%';
+      }
+
+      function renderRawData() {
+        var t = document.getElementById('rawData');
+        var head = '<tr><th>Vare</th><th>Kategori</th><th>Hvem</th><th>Betingelse</th><th>Type</th></tr>';
+        var rows = ITEMS.map(function (it) {
+          var type = isCounter(it) ? 'antal' + (it.perDay ? ' · pr. dag' : '') : 'ja/nej';
+          var who = it.who
+            .map(function (w) {
+              return WHO_LABEL[w] || w;
+            })
+            .join(', ');
+          var cond = CONDITION_LABEL[it.condition] || it.condition;
+          return (
+            '<tr><td>' +
+            it.name +
+            '</td><td>' +
+            it.category +
+            '</td><td>' +
+            who +
+            "</td><td><span class='tag'>" +
+            cond +
+            '</span></td><td>' +
+            type +
+            '</td></tr>'
+          );
+        }).join('');
+        t.innerHTML = head + rows;
+      }
+
+      /* =========================================================================
    4b) EXPORT / IMPORT (JSON)
    ========================================================================= */
-  function ioStatus(msg){ var e=document.getElementById('ioStatus'); if(e) e.textContent=msg||''; }
+      function ioStatus(msg) {
+        var e = document.getElementById('ioStatus');
+        if (e) e.textContent = msg || '';
+      }
 
-  function syncControls(){
-    document.querySelectorAll('input[name=season]').forEach(function(rb){ rb.checked=(rb.value===state.season); });
-    document.getElementById('warmDestination').checked=!!state.warmDestination;
-    document.getElementById('active').checked=!!state.active;
-    document.getElementById('days').value=state.days;
-  }
+      function syncControls() {
+        document.querySelectorAll('input[name=season]').forEach(function (rb) {
+          rb.checked = rb.value === state.season;
+        });
+        document.getElementById('warmDestination').checked = !!state.warmDestination;
+        document.getElementById('active').checked = !!state.active;
+        document.getElementById('days').value = state.days;
+      }
 
-  function exportJSON(){
-    var payload={ app:'smart-packing', schema:STATE_KEY, exported:new Date().toISOString(), data:state };
-    var blob=new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    a.href=url; a.download='pakkeliste-'+new Date().toISOString().slice(0,10)+'.json';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
-    ioStatus('Liste eksporteret ✓');
-  }
+      function exportJSON() {
+        var payload = { app: 'smart-packing', schema: STATE_KEY, exported: new Date().toISOString(), data: state };
+        var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'pakkeliste-' + new Date().toISOString().slice(0, 10) + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () {
+          URL.revokeObjectURL(url);
+        }, 1500);
+        ioStatus('Liste eksporteret ✓');
+      }
 
-  function importJSON(text){
-    var obj=JSON.parse(text);
-    var data=(obj && obj.data) ? obj.data : obj;   // accepts our wrapper or a raw state
-    state=mergeState(data);
-    currentView=null;
-    saveState();
-    renderPeople(); syncControls(); refresh();
-    ioStatus('Liste importeret ✓');
-  }
+      function importJSON(text) {
+        var obj = JSON.parse(text);
+        var data = obj && obj.data ? obj.data : obj; // accepts our wrapper or a raw state
+        state = mergeState(data);
+        currentView = null;
+        saveState();
+        renderPeople();
+        syncControls();
+        refresh();
+        ioStatus('Liste importeret ✓');
+      }
 
-/* =========================================================================
+      /* =========================================================================
    5) REFRESH + BIND
    ========================================================================= */
-  function refresh(){ saveState(); ensureView(); renderTabs(); renderView(); updateSummary(); }
+      function refresh() {
+        saveState();
+        ensureView();
+        renderTabs();
+        renderView();
+        updateSummary();
+      }
 
-  function bind(){
-    document.querySelectorAll('input[name=season]').forEach(function(rb){
-      rb.checked=(rb.value===state.season);
-      rb.addEventListener('change', function(){ if(rb.checked){ state.season=rb.value; refresh(); } });
-    });
-    function chk(id,key){ var e=document.getElementById(id); e.checked=!!state[key];
-      e.addEventListener('change', function(){ state[key]=e.checked; refresh(); }); }
-    chk('warmDestination','warmDestination'); chk('active','active');
-    var d=document.getElementById('days'); d.value=state.days;
-    d.addEventListener('input', function(){ state.days=d.value; refresh(); });
+      function bind() {
+        document.querySelectorAll('input[name=season]').forEach(function (rb) {
+          rb.checked = rb.value === state.season;
+          rb.addEventListener('change', function () {
+            if (rb.checked) {
+              state.season = rb.value;
+              refresh();
+            }
+          });
+        });
+        function chk(id, key) {
+          var e = document.getElementById(id);
+          e.checked = !!state[key];
+          e.addEventListener('change', function () {
+            state[key] = e.checked;
+            refresh();
+          });
+        }
+        chk('warmDestination', 'warmDestination');
+        chk('active', 'active');
+        var d = document.getElementById('days');
+        d.value = state.days;
+        d.addEventListener('input', function () {
+          state.days = d.value;
+          refresh();
+        });
 
-    document.getElementById('allInBtn').addEventListener('click', function(){ state.people.forEach(function(p){p.going=true;}); renderPeople(); refresh(); });
-    document.getElementById('noneInBtn').addEventListener('click', function(){ state.people.forEach(function(p){p.going=false;}); renderPeople(); refresh(); });
-    document.getElementById('addPersonBtn').addEventListener('click', addPerson);
-    document.getElementById('newPersonName').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); addPerson(); } });
+        document.getElementById('allInBtn').addEventListener('click', function () {
+          state.people.forEach(function (p) {
+            p.going = true;
+          });
+          renderPeople();
+          refresh();
+        });
+        document.getElementById('noneInBtn').addEventListener('click', function () {
+          state.people.forEach(function (p) {
+            p.going = false;
+          });
+          renderPeople();
+          refresh();
+        });
+        document.getElementById('addPersonBtn').addEventListener('click', addPerson);
+        document.getElementById('newPersonName').addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addPerson();
+          }
+        });
 
-    document.getElementById('resetBtn').addEventListener('click', function(){ state.count={}; saveState(); renderTabs(); renderView(); updateSummary(); ioStatus(''); });
-    document.getElementById('exportBtn').addEventListener('click', exportJSON);
-    var impFile=document.getElementById('importFile');
-    document.getElementById('importBtn').addEventListener('click', function(){ ioStatus(''); impFile.click(); });
-    impFile.addEventListener('change', function(){
-      var f=impFile.files && impFile.files[0]; if(!f) return;
-      var reader=new FileReader();
-      reader.onload=function(){ try{ importJSON(reader.result); }catch(e){ ioStatus('Kunne ikke læse filen — er det en gyldig pakkeliste-JSON?'); } impFile.value=''; };
-      reader.onerror=function(){ ioStatus('Kunne ikke læse filen.'); impFile.value=''; };
-      reader.readAsText(f);
-    });
-  }
+        document.getElementById('resetBtn').addEventListener('click', function () {
+          state.count = {};
+          saveState();
+          renderTabs();
+          renderView();
+          updateSummary();
+          ioStatus('');
+        });
+        document.getElementById('exportBtn').addEventListener('click', exportJSON);
+        var impFile = document.getElementById('importFile');
+        document.getElementById('importBtn').addEventListener('click', function () {
+          ioStatus('');
+          impFile.click();
+        });
+        impFile.addEventListener('change', function () {
+          var f = impFile.files && impFile.files[0];
+          if (!f) return;
+          var reader = new FileReader();
+          reader.onload = function () {
+            try {
+              importJSON(reader.result);
+            } catch (e) {
+              ioStatus('Kunne ikke læse filen — er det en gyldig pakkeliste-JSON?');
+            }
+            impFile.value = '';
+          };
+          reader.onerror = function () {
+            ioStatus('Kunne ikke læse filen.');
+            impFile.value = '';
+          };
+          reader.readAsText(f);
+        });
+      }
 
-/* =========================================================================
+      /* =========================================================================
    6) START
    ========================================================================= */
-  renderPeople();
-  bind();
-  renderRawData();
-  refresh();
+      renderPeople();
+      bind();
+      renderRawData();
+      refresh();
 
-/* =========================================================================
+      /* =========================================================================
    7) PWA — register the service worker (offline + installable).
    Only runs over https / localhost; silently ignored on file://.
    ========================================================================= */
-  if('serviceWorker' in navigator){
-    window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js').catch(function(){ /* ignore */ });
-    });
-  }
-</script>
-</body>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('./sw.js').catch(function () {
+            /* ignore */
+          });
+        });
+      }
+    </script>
+  </body>
 </html>
